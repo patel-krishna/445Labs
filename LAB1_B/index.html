@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Dash.js Rocks</title>
+        <style>
+            video {
+                width: 640px;
+                height: 360px;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <video id="videoPlayer" controls></video>
+        </div>
+        <!-- App -->
+    <!-- <script src="dash.all.debug.js"></script>
+    <script src="dash.mss.debug.js"></script>
+    <script src="ControlBar.js"></script>
+    <script src="cast.js"></script>
+    <script src="main.js"></script>
+    <script src="DownloadRatioRule.js"></script>
+    <script src="ThroughputRule.js"></script> -->
+        <script scr="main.js"></script>
+        <script src="dash.all.min.js"></script>
+        
+        <script>
+            (function(){
+                var url = "https://nustreaming.github.io/streaming/bbb.mpd";
+                var player = dashjs.MediaPlayer().create();
+                player.initialize(document.querySelector("#videoPlayer"), url, true);
+                
+                
+                var eventPoller = setInterval(function () {
+                var streamInfo = player.getActiveStream().getStreamInfo();
+                var dashMetrics = player.getDashMetrics();
+                var dashAdapter = player.getDashAdapter();
+
+            if (dashMetrics && streamInfo) {
+                const periodIdx = streamInfo.index;
+                var repSwitch = dashMetrics.getCurrentRepresentationSwitch('video', true);
+                var bufferLevel = dashMetrics.getCurrentBufferLevel('video', true);
+                var bitrate = repSwitch ? Math.round(dashAdapter.getBandwidthForRepresentation(repSwitch.to, periodIdx) / 1000) : NaN;
+                var adaptation = dashAdapter.getAdaptationForType(periodIdx, 'video', streamInfo);
+                var currentRep = adaptation.Representation_asArray.find(function (rep) {
+                    return rep.id === repSwitch.to
+                })
+                var frameRate = currentRep.frameRate;
+                var resolution = currentRep.width + 'x' + currentRep.height;
+                console.log(bufferLevel + " secs");
+                console.log(frameRate + " fps");
+                console.log(bitrate + " Kbps");
+                console.log(resolution + " res");
+            }
+        }, 8000);
+
+
+
+            })();
+        </script>
+    </body>
+</html>

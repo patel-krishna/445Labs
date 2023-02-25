@@ -28,8 +28,64 @@
             (function(){
                 var url = "https://nustreaming.github.io/streaming/bbb.mpd";
                 var player = dashjs.MediaPlayer().create();
-                player.initialize(document.querySelector("#videoPlayer"), url, true);
+                // player.initialize(document.querySelector("#videoPlayer"), url, true);
+              
+              //TO-DO update the setting of player depending on different algorithm, dynamic, BOLA, throughput 
+                    //DYNAMIC
+                //     player.updateSettings({
+                //     streaming: {
+                //         abr: {
+                //             useDefaultABRRules: true,
+                //             ABRStrategy: 'abrDynamic',
+                //             additionalAbrRules: {
+                //                 insufficientBufferRule: true,
+                //                 switchHistoryRule: false,
+                //                 droppedFramesRule: false,
+                //                 abandonRequestsRule: false
+                //             }
+                            
+                //         }
+                //     }
+                // });
                 
+                    //BOLA
+                    player.updateSettings({
+                    streaming: {
+                        abr: {
+                            useDefaultABRRules: true,
+                            ABRStrategy: 'abrBola',
+                            additionalAbrRules: {
+                                insufficientBufferRule: true,
+                                switchHistoryRule: false,
+                                droppedFramesRule: false,
+                                abandonRequestsRule: false
+                            }
+                            
+                        }
+                    }
+                });
+        
+
+                    //THROUGHPUT
+                //     player.updateSettings({
+                //     streaming: {
+                //         abr: {
+                //             useDefaultABRRules: true,
+                //             ABRStrategy: 'abrThroughput',
+                //             additionalAbrRules: {
+                //                 insufficientBufferRule: true,
+                //                 switchHistoryRule: false,
+                //                 droppedFramesRule: false,
+                //                 abandonRequestsRule: false
+                //             }
+                            
+                //         }
+                //     }
+                // }); 
+
+                player.initialize(document.querySelector("#videoPlayer"), url, true);
+
+            //RUN EVERY 8 SECONDS
             var eventPoller = setInterval(function () {
                 var streamInfo = player.getActiveStream().getStreamInfo();
                 var dashMetrics = player.getDashMetrics();
@@ -39,34 +95,45 @@
                 const periodIdx = streamInfo.index;
                 var repSwitch = dashMetrics.getCurrentRepresentationSwitch('video', true);
                 
+                //BUFFER LEVEL (SECONDS)
                 var bufferLevel = dashMetrics.getCurrentBufferLevel('video', true);
                 
+                //MEASURED THROUGHPUT (KPBS)
                 var throughput = player.getAverageThroughput('video');
                 
+                //SELECTED BITRATE (KBPS)
                 var bitrate = repSwitch ? Math.round(dashAdapter.getBandwidthForRepresentation(repSwitch.to, periodIdx) / 1000) : NaN;
 
+                //HTTP REQUEST 
                 var downloadRequest = dashMetrics.getCurrentHttpRequest("video",true);
                 
+                //DOWNLOAD TIME (SECONDS)
                 var downloadTime = downloadRequest.tresponse.getTime() - downloadRequest.trequest.getTime();
             
+                //CONTENT LENGTH
                 var temp_string = downloadRequest['_responseHeaders'];
                 const arr = temp_string.split("\n");
                 content_size = arr[1];
+
+                //ABR ALGORITHM
+                var playerSettings = player.getSettings();
+                var abrStrategy = playerSettings.streaming.abr.ABRStrategy;
+
+
                 
-
-
                 var adaptation = dashAdapter.getAdaptationForType(periodIdx, 'video', streamInfo);
                 var currentRep = adaptation.Representation_asArray.find(function (rep) {
                     return rep.id === repSwitch.to
                 })
                 
+                //PRINTING TO CONSOLE
+                console.log('Current ABR strategy:', abrStrategy);
                 console.log("Buffer level: "+ bufferLevel + " secs");
                 console.log("Bitrate: "+ bitrate + " Kbps");
                 console.log("Measured throughput: "+ throughput+ " kbps");
                 console.log(content_size+" bytes")
                 console.log("Download time:", downloadTime, "ms")
                 console.log("-----")
-    
             }
             }, 8000);
             })();

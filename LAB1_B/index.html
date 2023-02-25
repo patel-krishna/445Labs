@@ -38,12 +38,17 @@
             if (dashMetrics && streamInfo) {
                 const periodIdx = streamInfo.index;
                 var repSwitch = dashMetrics.getCurrentRepresentationSwitch('video', true);
+                
                 var bufferLevel = dashMetrics.getCurrentBufferLevel('video', true);
+                
                 var throughput = player.getAverageThroughput('video');
+                
                 var bitrate = repSwitch ? Math.round(dashAdapter.getBandwidthForRepresentation(repSwitch.to, periodIdx) / 1000) : NaN;
 
                 var downloadRequest = dashMetrics.getCurrentHttpRequest("video",true);
-
+                
+                var downloadTime = downloadRequest.tresponse.getTime() - downloadRequest.trequest.getTime();
+            
                 var temp_string = downloadRequest['_responseHeaders'];
                 const arr = temp_string.split("\n");
                 content_size = arr[1];
@@ -54,15 +59,14 @@
                 var currentRep = adaptation.Representation_asArray.find(function (rep) {
                     return rep.id === repSwitch.to
                 })
-               
+                
                 console.log("Buffer level: "+ bufferLevel + " secs");
                 console.log("Bitrate: "+ bitrate + " Kbps");
                 console.log("Measured throughput: "+ throughput+ " kbps");
                 console.log(content_size+" bytes")
+                console.log("Download time:", downloadTime, "ms")
                 console.log("-----")
-                
- 
-
+    
             }
             }, 8000);
             })();

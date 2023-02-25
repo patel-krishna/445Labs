@@ -32,28 +32,11 @@
               
               //TO-DO update the setting of player depending on different algorithm, dynamic, BOLA, throughput 
                     //DYNAMIC
-                //     player.updateSettings({
-                //     streaming: {
-                //         abr: {
-                //             useDefaultABRRules: true,
-                //             ABRStrategy: 'abrDynamic',
-                //             additionalAbrRules: {
-                //                 insufficientBufferRule: true,
-                //                 switchHistoryRule: false,
-                //                 droppedFramesRule: false,
-                //                 abandonRequestsRule: false
-                //             }
-                            
-                //         }
-                //     }
-                // });
-                
-                    //BOLA
                     player.updateSettings({
                     streaming: {
                         abr: {
                             useDefaultABRRules: true,
-                            ABRStrategy: 'abrBola',
+                            ABRStrategy: 'abrDynamic',
                             additionalAbrRules: {
                                 insufficientBufferRule: true,
                                 switchHistoryRule: false,
@@ -64,6 +47,23 @@
                         }
                     }
                 });
+                
+                    //BOLA
+                //     player.updateSettings({
+                //     streaming: {
+                //         abr: {
+                //             useDefaultABRRules: true,
+                //             ABRStrategy: 'abrBola',
+                //             additionalAbrRules: {
+                //                 insufficientBufferRule: true,
+                //                 switchHistoryRule: false,
+                //                 droppedFramesRule: false,
+                //                 abandonRequestsRule: false
+                //             }
+                            
+                //         }
+                //     }
+                // });
         
 
                     //THROUGHPUT
@@ -113,7 +113,7 @@
                 //CONTENT LENGTH
                 var temp_string = downloadRequest['_responseHeaders'];
                 const arr = temp_string.split("\n");
-                content_size = arr[1];
+                content_size = arr[1].trim().replace(/\n$/, '');
 
                 //ABR ALGORITHM
                 var playerSettings = player.getSettings();

@@ -30,7 +30,6 @@
                 var player = dashjs.MediaPlayer().create();
                 player.initialize(document.querySelector("#videoPlayer"), url, true);
                 
-                
             var eventPoller = setInterval(function () {
                 var streamInfo = player.getActiveStream().getStreamInfo();
                 var dashMetrics = player.getDashMetrics();
@@ -42,20 +41,36 @@
                 var bufferLevel = dashMetrics.getCurrentBufferLevel('video', true);
                 var throughput = player.getAverageThroughput('video');
                 var bitrate = repSwitch ? Math.round(dashAdapter.getBandwidthForRepresentation(repSwitch.to, periodIdx) / 1000) : NaN;
+
+                var downloadRequest = dashMetrics.getCurrentHttpRequest("video",true);
+
+                var temp_string = downloadRequest['_responseHeaders'];
+                const arr = temp_string.split("\n");
+                content_size = arr[1];
+                
+
+
                 var adaptation = dashAdapter.getAdaptationForType(periodIdx, 'video', streamInfo);
                 var currentRep = adaptation.Representation_asArray.find(function (rep) {
                     return rep.id === repSwitch.to
                 })
+               
                 console.log("Buffer level: "+ bufferLevel + " secs");
                 console.log("Bitrate: "+ bitrate + " Kbps");
                 console.log("Measured throughput: "+ throughput+ " kbps");
+                console.log(content_size+" bytes")
                 console.log("-----")
+                
+ 
+
             }
             }, 8000);
-
-
-
             })();
+
+
+            
+
+
         </script>
     </body>
 </html>

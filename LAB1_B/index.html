@@ -32,21 +32,21 @@
               
               //TO-DO update the setting of player depending on different algorithm, dynamic, BOLA, throughput 
                     //DYNAMIC
-                    player.updateSettings({
-                    streaming: {
-                        abr: {
-                            // useDefaultABRRules: true,
-                            ABRStrategy: 'abrDynamic'
-                            // additionalAbrRules: {
-                            //     insufficientBufferRule: false,
-                            //     switchHistoryRule: false,
-                            //     droppedFramesRule: false,
-                            //     abandonRequestsRule: false
-                            // }
+                //     player.updateSettings({
+                //     streaming: {
+                //         abr: {
+                //             // useDefaultABRRules: true,
+                //             ABRStrategy: 'abrDynamic'
+                //             // additionalAbrRules: {
+                //             //     insufficientBufferRule: false,
+                //             //     switchHistoryRule: false,
+                //             //     droppedFramesRule: false,
+                //             //     abandonRequestsRule: false
+                //             // }
                             
-                        }
-                    }
-                });
+                //         }
+                //     }
+                // });
                 
                     //BOLA
                 //     player.updateSettings({
@@ -67,21 +67,21 @@
         
 
                     //THROUGHPUT
-                //     player.updateSettings({
-                //     streaming: {
-                //         abr: {
-                //             useDefaultABRRules: true,
-                //             ABRStrategy: 'abrThroughput',
-                //             additionalAbrRules: {
-                //                 insufficientBufferRule: true,
-                //                 switchHistoryRule: false,
-                //                 droppedFramesRule: false,
-                //                 abandonRequestsRule: false
-                //             }
+                    player.updateSettings({
+                    streaming: {
+                        abr: {
+                            useDefaultABRRules: true,
+                            ABRStrategy: 'abrThroughput'
+                            // additionalAbrRules: {
+                            //     insufficientBufferRule: true,
+                            //     switchHistoryRule: false,
+                            //     droppedFramesRule: false,
+                            //     abandonRequestsRule: false
+                            // }
                             
-                //         }
-                //     }
-                // }); 
+                        }
+                    }
+                 }); 
 
                 player.initialize(document.querySelector("#videoPlayer"), url, true);
 

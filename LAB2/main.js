@@ -94,27 +94,41 @@ startButton.addEventListener('click', async function startVideoCapture() {
 
 function sendData(buffer){
   
-  console.log("THE REQUEST")
+  console.log("-----THE REQUEST-----")
   
   while(counter<buffer.length){
     console.log("COUNTER STATUS: "+ counter)
     console.log("BUFFER STATUS: "+buffer.length)
+    
+    // setting up xhr request
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'http://localhost:8888/445Labs/LAB2/backend.php', true);
+    xhr.open('POST', 'backend.php', true);
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     
+    // setting up data to send in a form
     var form = new FormData();
-    form.append("number", counter);
-    const segment = new Blob(buffer[counter], { type: "video/mp4" });
-    form.append("blob", segment);
+    form.append("int", counter.toString());
 
+  
+    var blob = buffer[counter];
+    var segment = new Blob([blob], { type: "video/webm" });
+    form.append("blob", segment, 'tmp_name');
+    
+
+    console.log("Form data before sending: ");
+for (let pair of form.entries()) {
+  console.log(pair[0]+ ', ' + pair[1]); 
+}
+
+    // send form
     xhr.send(form);
-
+  
+    // wait for response from php server
     xhr.onreadystatechange = function() {
       if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-        console.log(xhr.responseText);
+        console.log("RESPONSE: "+xhr.responseText);
         if (xhr.responseText === "Request received successfully") {
-          console.log("Request received successfully");
+          console.log("Test-Request received successfully");
         } else {
           console.log("Error: Request not received successfully");
         }

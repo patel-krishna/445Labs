@@ -1,3 +1,32 @@
+/**
+ * To capture a live video feed of 720p resolution at 30 fps from the device camera and encode frames with h.264 encoding with 5 Mbps bitrate levels, you can use WebCodecs API for web applications or MediaCodec API for Android applications.
+
+Here are the general steps for capturing and encoding video frames using these APIs:
+
+Create a canvas element for video rendering and a video element for video capture.
+
+Use the getUserMedia() method to request permission to access the camera and microphone. This method returns a Promise that resolves to a MediaStream object.
+
+Create a MediaRecorder object to record the video stream. Use the MediaRecorder API to specify the desired video format, codec, and bitrate settings. For h.264 encoding with 5 Mbps bitrate levels, you can set the mimeType property to "video/mp4;codecs=avc" and the video bitrate to 5000 kbps.
+
+Add event listeners to the MediaRecorder object to handle the dataavailable and stop events. The dataavailable event fires when new data is available from the recorder, and the stop event fires when recording is complete.
+
+Create a video encoder using the createEncoder() method from the WebCodecs API or MediaCodec API. Set the desired video format, codec, and bitrate settings using the appropriate API.
+
+Create a canvas rendering context and draw the video frames onto the canvas. Use the getImageData() method to retrieve the image data from the canvas.
+
+Use the encode() method of the video encoder to encode the image data as a video frame. This method returns a Promise that resolves to a EncodedVideoChunk object.
+
+Use the appendChunk() method of the MediaRecorder object to append the encoded video chunk to the recording.
+
+Repeat steps 6-8 to continue capturing and encoding video frames.
+
+When finished recording, use the stop() method of the MediaRecorder object to stop recording.
+
+Note that the exact steps may vary depending on the specific API and application you are using. It is recommended to refer to the documentation and examples provided by the API to ensure proper implementation.
+ */
+
+
 const videoElement = document.createElement('video');
 const video = document.getElementById('video');
 const startButton= document.querySelector('button#start-streaming');
@@ -11,23 +40,52 @@ const settings = {
   audio: true
 };
 let stream = null; 
+let recorder = null; 
+const buffer = [];
 
 
 startButton.addEventListener('click', async function startVideoCapture() {
             try {
               stream = await navigator.mediaDevices.getUserMedia(settings);
-              console.log("streaming");
+              console.log("streaming started");
               video.srcObject = stream;
               video.play();
               // document.body.appendChild(video);
             } catch (error) {
               console.error('Error starting video capture:', error);
             }
+
+            console.log("creating recorder");
+            recorder = new MediaRecorder(stream, {
+              mimeType: "video/webm;codecs=h264",
+              videoBitsPerSecond: 5000000
+            });
+            console.log("recorder created");
+
+            recorder.start();
+
+            recorder.addEventListener('dataavailable', (event) => {
+              // handle new data
+              console.log("New data");
+              buffer.push(event.data);
+              console.log("Length of buffer"+buffer.length);
+
+            });
+            
+            recorder.addEventListener('stop', (event) => {
+              // handle end of recording
+              console.log("Media recorder stopped");
+            });
+
+            
+
+
   });
 
 
   stopButton.addEventListener('click', function stopVideoCapture() {
     if (stream !== null) {
+      console.log("streaming stopped");
       stream.getTracks().forEach(track => track.stop());
       video.srcObject = null;
     }

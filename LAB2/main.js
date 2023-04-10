@@ -42,6 +42,7 @@ const settings = {
 let stream = null; 
 let recorder = null; 
 const buffer = [];
+var counter = 0; 
 
 
 startButton.addEventListener('click', async function startVideoCapture() {
@@ -62,14 +63,14 @@ startButton.addEventListener('click', async function startVideoCapture() {
             });
             console.log("recorder created");
 
-            recorder.start();
+            recorder.start(3000);
 
             recorder.addEventListener('dataavailable', (event) => {
               // handle new data
               console.log("New data");
               buffer.push(event.data);
-              console.log("Length of buffer"+buffer.length);
-
+              console.log("Length of buffer: "+buffer.length);
+              sendData(buffer);
             });
             
             recorder.addEventListener('stop', (event) => {
@@ -91,7 +92,36 @@ startButton.addEventListener('click', async function startVideoCapture() {
     }
   });
 
+function sendData(buffer){
+  
+  console.log("THE REQUEST")
+  
+  while(counter<buffer.length){
+    console.log("COUNTER STATUS: "+ counter)
+    console.log("BUFFER STATUS: "+buffer.length)
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'http://localhost:8888/445Labs/LAB2/backend.php', true);
+    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    
+    var form = new FormData();
+    form.append("number", counter);
+    const segment = new Blob(buffer[counter], { type: "video/mp4" });
+    form.append("blob", segment);
 
+    xhr.send(form);
+
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+        console.log(xhr.responseText);
+        if (xhr.responseText === "Request received successfully") {
+          console.log("Request received successfully");
+        } else {
+          console.log("Error: Request not received successfully");
+        }
+      }}
+    counter = counter+1;
+  }
+};
 
 
 

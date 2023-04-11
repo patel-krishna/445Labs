@@ -68,7 +68,8 @@ startButton.addEventListener('click', async function startVideoCapture() {
             recorder.addEventListener('dataavailable', (event) => {
               // handle new data
               console.log("New data");
-              buffer.push(event.data);
+              segment = new Blob([event.data], { type: "video/webm" } );
+              buffer.push(segment);
               console.log("Length of buffer: "+buffer.length);
               sendData(buffer);
             });
@@ -117,12 +118,13 @@ function sendData(buffer){
     
     // setting up data to send in a form
     var form = new FormData();
-    form.append("int", counter.toString());
-
+    // form.append("int", counter.toString());
+    form.append("int", 10);
   
     var blob = buffer[counter];
     var segment = new Blob([blob], { type: "video/webm" });
-    form.append("blob", segment, 'tmp_name');
+    form.append("blob", blob, 'tmp_name');
+    console.log(blob);
     
 
     console.log("Form data before sending: ");

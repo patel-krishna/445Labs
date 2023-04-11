@@ -7,7 +7,7 @@
     // being added to the sql database as well. 
 
     // Read the integer value from the request
-    $myInt = (int)$_POST["int"];
+    $myInt = intval($_POST["int"]);
     
     // echo ('test'. $myInt);
 

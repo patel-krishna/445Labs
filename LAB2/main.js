@@ -76,10 +76,20 @@ startButton.addEventListener('click', async function startVideoCapture() {
             recorder.addEventListener('stop', (event) => {
               // handle end of recording
               console.log("Media recorder stopped");
+
+              // Extra-credit
+              counter = 0;
+              temp_blob = new Blob(buffer, { type: "video/mp4" });
+              url = URL.createObjectURL(temp_blob);
+              playbackVideo = document.createElement("a");
+              document.body.appendChild(playbackVideo);
+              playbackVideo.href = url; 
+              playbackVideo.download = 'playback-video.mp4';
+              replay = document.createElement('video');
+              document.body.appendChild(replay);
+              replay.src = url;
+              replay.play();
             });
-
-            
-
 
   });
 
@@ -116,9 +126,9 @@ function sendData(buffer){
     
 
     console.log("Form data before sending: ");
-for (let pair of form.entries()) {
-  console.log(pair[0]+ ', ' + pair[1]); 
-}
+      for (let pair of form.entries()) {
+        console.log(pair[0]+ ', ' + pair[1]); 
+      }
 
     // send form
     xhr.send(form);

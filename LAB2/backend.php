@@ -15,7 +15,7 @@
 
     //uploading files to local directory 
     //were not able to connect to concordia server 
-    $uploadDir = 'C:\Users\Krish\.vscode\445Labs\LAB2\client\\';
+    $uploadDir = 'client//';
     $fileName = $_FILES['segment']['name'];
     $fileTmpName = $_FILES['segment']['tmp_name'];
 
@@ -28,6 +28,27 @@
     $uniqueID = $_POST['id']; 
     $date = date('Y-m-d h:i:s');
 
+    // Create a list of the video segments
+    $segmentFile = $uploadDir . $uniqueID . '.txt'; // replace with your file name
+
+    // Check if the file exists, if not create it
+    if (!file_exists($segmentFile)) {
+        file_put_contents($segmentFile, '');
+    }
+
+    // Get the list of video segment files
+    $segments = file($segmentFile, FILE_IGNORE_NEW_LINES);
+
+    // Add a new segment to the list of files
+    $newSegment = $fileTmpName; // replace with the file name of the new segment
+    $segments[] = $newSegment;
+
+    // Update the list of files in the text file
+    file_put_contents($segmentFile, implode(PHP_EOL, $segments));
+
+    $command = "C:\\ffmpeg\\bin\\ffmpeg -f concat -safe 0 -i $segmentFile -c copy output.mp4";
+
+    exec($command);
 
     //add to sql database
     $user = 'root';

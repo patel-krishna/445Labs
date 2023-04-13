@@ -64,18 +64,26 @@ startButton.addEventListener('click', async function startVideoCapture() {
             console.log("recorder created");
 
             recorder.start(3000);
-
+            
+            
+            
+            // handle new data
             recorder.addEventListener('dataavailable', (event) => {
-              // handle new data
+              
               console.log("New data");
-              segment = new Blob([event.data], { type: "video/webm" } );
-              buffer.push(segment);
-              console.log("Length of buffer: "+buffer.length);
-              sendData(buffer);
+              segment = new Blob([event.data], { type: "video/mp4" } );
+              buffer.push(event.data);
+              sendData(segment);
+              // console.log("Length of buffer: "+buffer.length);
+              // sendData(buffer);
             });
             
+            
+            
+            
+            // handle end of recording
             recorder.addEventListener('stop', (event) => {
-              // handle end of recording
+              
               console.log("Media recorder stopped");
 
               // Extra-credit
@@ -103,51 +111,80 @@ startButton.addEventListener('click', async function startVideoCapture() {
     }
   });
 
-function sendData(buffer){
+
+
+function sendData(segment){
+  const formData = new FormData();
+      formData.append('segment', segment, 'video'+counter+'.mp4')
+
+      fetch('backend.php', {
+              method: 'POST',
+              body: formData
+            })
+                    .then((response) => response.text())
+                    .then((result) => {
+                        console.log('Upload result:', result);
+                        // Decrement the upload counter
+                        counter--;
+                    })
+                    .catch((error) => {
+                        console.error('Error uploading video segment:', error);
+                        // Decrement the upload counter
+                        // uploadCounter--;
+                    });        
+}
+
+
+
+
+// function sendData(buffer){
   
-  console.log("-----THE REQUEST-----")
+//   console.log("-----THE REQUEST-----")
   
-  while(counter<buffer.length){
-    console.log("COUNTER STATUS: "+ counter)
-    console.log("BUFFER STATUS: "+buffer.length)
+//   while(counter<buffer.length){
+//     console.log("COUNTER STATUS: "+ counter)
+//     console.log("BUFFER STATUS: "+buffer.length)
     
-    // setting up xhr request
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'backend.php', true);
-    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+//     // setting up xhr request
+//     const xhr = new XMLHttpRequest();
+//     xhr.open('POST', 'backend.php', true);
+//     xhr.setRequestHeader("Content-type", 'multipart/form-data');
     
-    // setting up data to send in a form
-    var form = new FormData();
-    // form.append("int", counter.toString());
-    form.append("int", 10);
+//     // setting up data to send in a form
+//     var form = new FormData();
+//     // form.append("int", counter.toString());
+//     // form.append("int", 10);
   
-    var blob = buffer[counter];
-    var segment = new Blob([blob], { type: "video/webm" });
-    form.append("blob", blob, 'tmp_name');
-    console.log(blob);
+//     var blob = buffer[counter];
+//     var segment = new Blob([blob], { type: "video/mp4" });
+//     var file = new File([blob], 'video'+counter+'.mp4', { type: "video/mp4" });
+//     form.append("file[]", file);
+    
+   
+//     console.log(form.get('file[]'));
     
 
-    console.log("Form data before sending: ");
-      for (let pair of form.entries()) {
-        console.log(pair[0]+ ', ' + pair[1]); 
-      }
+//     console.log("Form data before sending: ");
+//       for (let pair of form.entries()) {
+//         console.log(pair[0]+ ', ' + pair[1]); 
+//       }
 
-    // send form
-    xhr.send(form);
+//     // send form
+//     xhr.send(form);
   
-    // wait for response from php server
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-        console.log("RESPONSE: "+xhr.responseText);
-        if (xhr.responseText === "Request received successfully") {
-          console.log("Test-Request received successfully");
-        } else {
-          console.log("Error: Request not received successfully");
-        }
-      }}
-    counter = counter+1;
-  }
-};
+//     // wait for response from php server
+//     xhr.onreadystatechange = function() {
+//       if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+//         console.log("RESPONSE: "+xhr.responseText);
+//         // if (xhr.responseText === "Request received successfully") {
+//         //   console.log("Test-Request received successfully");
+//         // } else {
+//         //   console.log("Error: Request not received successfully");
+//         // }
+//       }}
+//     counter = counter+1;
+//   }
+// };
 
 
 

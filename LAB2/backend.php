@@ -6,10 +6,6 @@
     // 2. The blob data is empty, nothing is being printed to the console 
     // being added to the sql database as well. 
 
-    // Read the integer value from the request
-    $myInt = intval($_POST["int"]);
-    
-    // echo ('test'. $myInt);
 
     // --------OLD--------
     // Read the raw data of the Blob from the php://input stream
@@ -19,13 +15,25 @@
     // $blob = new Blob([$blobData], ["type" => "video/mp4"]);
     // ----------------------
     
+
+    $uploadDir = 'C:\Users\Krish\.vscode\445Labs\LAB2\client\\';
+    $fileName = $_FILES['segment']['name'];
+    $fileTmpName = $_FILES['segment']['tmp_name'];
+
+    if (move_uploaded_file($fileTmpName, $uploadDir . $fileName)) {
+        echo "File uploaded successfully.";
+    } else {
+        echo "Error uploading file.";
+    }
+    
+    
+      print_r($_FILES);
+
     $blob_file = $_FILES['blob']['tmp_name'];
-    $blob_data = file_get_contents($blob_file);
-    echo($blob_data);
+    // $blob_data = file_get_contents($blob_file);
+    // file_put_contents($filePath, $blob_data);
 
-
-    // Do something with the integer and the Blob object -- add to sql database
-
+    //add to sql database
     $user = 'root';
     $password = 'root';
     $db = '445lab2';

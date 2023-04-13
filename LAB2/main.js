@@ -65,6 +65,7 @@ startButton.addEventListener('click', async function startVideoCapture() {
 
             recorder.start(3000);
             
+            var id = "id" + Math.random().toString(16).slice(2);
             
             
             // handle new data
@@ -73,12 +74,10 @@ startButton.addEventListener('click', async function startVideoCapture() {
               console.log("New data");
               segment = new Blob([event.data], { type: "video/mp4" } );
               buffer.push(event.data);
-              sendData(segment);
+              sendData(segment, id);
               // console.log("Length of buffer: "+buffer.length);
               // sendData(buffer);
             });
-            
-            
             
             
             // handle end of recording
@@ -108,14 +107,17 @@ startButton.addEventListener('click', async function startVideoCapture() {
       console.log("streaming stopped");
       stream.getTracks().forEach(track => track.stop());
       video.srcObject = null;
+      counter = 0;
+      buffer = [];
     }
   });
 
 
 
-function sendData(segment){
+function sendData(segment,id){
   const formData = new FormData();
-      formData.append('segment', segment, 'video'+counter+'.mp4')
+      formData.append('segment', segment, 'video'+counter+'.mp4');
+      formData.append('id', id);
 
       fetch('backend.php', {
               method: 'POST',
@@ -124,13 +126,11 @@ function sendData(segment){
                     .then((response) => response.text())
                     .then((result) => {
                         console.log('Upload result:', result);
-                        // Decrement the upload counter
-                        counter--;
+                        // Increment the upload counter
+                        counter++;
                     })
                     .catch((error) => {
                         console.error('Error uploading video segment:', error);
-                        // Decrement the upload counter
-                        // uploadCounter--;
                     });        
 }
 

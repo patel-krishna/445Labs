@@ -1,10 +1,7 @@
 <?php
 
     // TO-DO : CURRENT ISSUES 
-    // 1. the couner integer is not being passed properly to php
-    // this causes for the IDs in sql to always be 0
-    // 2. The blob data is empty, nothing is being printed to the console 
-    // being added to the sql database as well. 
+    // 1. The video segments are not playing 
 
 
     // --------OLD--------
@@ -16,6 +13,8 @@
     // ----------------------
     
 
+    //uploading files to local directory 
+    //were not able to connect to concordia server 
     $uploadDir = 'C:\Users\Krish\.vscode\445Labs\LAB2\client\\';
     $fileName = $_FILES['segment']['name'];
     $fileTmpName = $_FILES['segment']['tmp_name'];
@@ -26,12 +25,9 @@
         echo "Error uploading file.";
     }
     
-    
-      print_r($_FILES);
+    $uniqueID = $_POST['id']; 
+    $date = date('Y-m-d h:i:s');
 
-    $blob_file = $_FILES['blob']['tmp_name'];
-    // $blob_data = file_get_contents($blob_file);
-    // file_put_contents($filePath, $blob_data);
 
     //add to sql database
     $user = 'root';
@@ -47,39 +43,37 @@
       die("Connection failed: " . $conn->connect_error);
     }
 
+  $sql = "INSERT INTO videos (identifier, video, uploadtime)
+      VALUES ('$uniqueID', '$fileName', CURRENT_TIMESTAMP())";
 
+      if ($conn->query($sql) === TRUE) {
+        echo "New record created successfully";
+      } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+      }
+
+      $conn->close();
     
 // Prepare the insert statement
-$stmt = $conn->prepare("INSERT INTO segments (ID, Segment) VALUES (?, ?)");
+// $stmt = $conn->prepare("INSERT INTO videos (ID, Segment) VALUES (?, ?)");
 
-// Bind the parameters to the statement
-$stmt->bind_param("is", $myInt, $blob_data);
+// // Bind the parameters to the statement
+// $stmt->bind_param("is", $myInt, $blob_data);
 
-// Execute the statement
-if ($stmt->execute() === TRUE) {
-  echo "New record created successfully";
-} else {
-  echo "Error: " . $stmt->error;
-}
+// // Execute the statement
+// if ($stmt->execute() === TRUE) {
+//   echo "New record created successfully";
+// } else {
+//   echo "Error: " . $stmt->error;
+// }
 
-// Close the statement and connection
-$stmt->close();
-$conn->close();
+// // Close the statement and connection
+// $stmt->close();
+// $conn->close();
 
-    // $sql = "INSERT INTO segments (ID, Segment)
-    // VALUES ($myInt, $blob_data)";
-
-    // if ($conn->query($sql) === TRUE) {
-    //   echo "New record created successfully";
-    // } else {
-    //   echo "Error: " . $sql . "<br>" . $conn->error;
-    // }
-
-    $conn->close();
-
-  
+    
     // Send a response to the client
-    echo "Request received successfully";
+    // echo "Request received successfully";
 
   
 
